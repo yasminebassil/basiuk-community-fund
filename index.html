@@ -37,8 +37,13 @@
     .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 6px; }
     .hero .dates { font-size: 1rem; opacity: 0.7; margin-bottom: 20px; }
     .hero .memorial-message {
-      max-width: 640px; margin: 0 auto;
-      font-size: 1.05rem; opacity: 0.9; line-height: 1.7;
+      max-width: 640px; margin: 20px auto 0;
+      font-size: 1.05rem; line-height: 1.7;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px; padding: 24px 28px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.92);
     }
 
     /* ---------- PROGRESS BAR ---------- */
@@ -90,7 +95,7 @@
       background: #fff; border-radius: 12px; padding: 28px 32px;
       box-shadow: 0 4px 24px rgba(0,0,0,0.08); text-align: left;
     }
-    .form-card h2 { font-size: 1.3rem; margin-bottom: 18px; color: #0f3460; }
+    .form-card h2 { font-size: 1.3rem; margin-bottom: 6px; color: #0f3460; }
     .form-row { margin-bottom: 14px; }
     .form-row label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #555; }
     .form-row input, .form-row textarea {
@@ -158,11 +163,16 @@
       <img src="photo.png" alt="Larry Robinson">
     </div>
     <h1 id="heroName">Robinson-Basiuk Community Fund</h1>
-    <div class="dates">In Loving Memory of Larry Robinson</div>
+    <div class="dates">In Loving Memory of Larry Robinson, &dagger; 2026</div>
     <p class="memorial-message">
-      This page is dedicated to Larry Robinson, a wonderful person who has touched so many lives.
-      We are coming together as friends and family to support his loved ones during this difficult time.
-      This fund will help cover all costs associated with his passing.
+      This page is dedicated to Larry Robinson, a wonderful person who has touched so many of our lives.
+      Larry was a loving husband, a caring father, and a dear friend to many.
+      We are sad to share his passing on ___ from medical complications.
+      <br><br>
+      As we mourn the loss of Larry from our lives, we are coming together as friends and family
+      to support his loved ones during this difficult time. This fund will help cover all costs
+      that his loved ones have incurred at this time, including medical costs, hospice care,
+      and costs associated with his passing.
       <br><br>
       Any contribution, no matter how small, means the world. Thank you for your generosity and love.
     </p>
@@ -210,7 +220,7 @@
     <div class="zelle-card">
       <h2>What Happens to Your Donation?</h2>
       <p style="font-size: 0.93rem; color: #555; line-height: 1.7; margin-top: 10px;">
-        All donations are collected by the Fund Manager (Yasmine Bassil) via Zelle.
+        All donations are collected by the Fund Manager (see bottom of page for contact information) via Zelle.
         100% of the funds will be transferred directly to the Robinson-Basiuk Family, and a receipt of transfer will be posted to this website.
         No portion of your donation goes toward platform fees or administrative costs.
       </p>
@@ -221,6 +231,7 @@
   <section class="form-section">
     <div class="form-card">
       <h2>Leave a Message &amp; Log Your Donation</h2>
+      <p style="font-size: 0.9rem; color: #888; margin-bottom: 16px;">Donated via Zelle? Please log your donation below so we can keep track. You're also welcome to leave just a message &mdash; no donation required.</p>
       <form id="postForm">
         <div class="form-row-inline">
           <div class="form-row">
@@ -252,7 +263,11 @@
     </div>
   </section>
 
-  <footer>Made with love by friends &amp; family.</footer>
+  <footer>
+    Made with love by friends, turned family.
+    <br>
+    <span style="margin-top: 6px; display: inline-block;">Fund Manager Contact Information: Yasmine Bassil, yasminebassil [at] gmail [dot] com</span>
+  </footer>
 
   <div class="toast" id="toast">Thank you for your support!</div>
 
