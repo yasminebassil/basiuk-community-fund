@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>In Loving Memory</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f5f3f0;
+      color: #2c2c2c;
+      line-height: 1.6;
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #fff;
+      text-align: center;
+      padding: 60px 20px 50px;
+    }
+    .hero .photo-placeholder {
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.3);
+      margin: 0 auto 24px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: rgba(255,255,255,0.5);
+    }
+    .hero .photo-placeholder img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 6px; }
+    .hero .dates { font-size: 1rem; opacity: 0.7; margin-bottom: 20px; }
+    .hero .memorial-message {
+      max-width: 640px; margin: 0 auto;
+      font-size: 1.05rem; opacity: 0.9; line-height: 1.7;
+    }
+
+    /* ---------- PROGRESS BAR ---------- */
+    .progress-section {
+      max-width: 700px; margin: -30px auto 0; padding: 0 20px; position: relative; z-index: 2;
+    }
+    .progress-card {
+      background: #fff; border-radius: 12px; padding: 28px 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .progress-amounts { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .progress-raised { font-size: 1.8rem; font-weight: 700; color: #0f3460; }
+    .progress-goal { font-size: 0.95rem; color: #888; }
+    .progress-bar-bg {
+      width: 100%; height: 10px; background: #e8e8e8; border-radius: 5px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; background: linear-gradient(90deg, #0f3460, #3a86ff); border-radius: 5px;
+      transition: width 0.6s ease;
+    }
+    .progress-donors { margin-top: 10px; font-size: 0.9rem; color: #888; }
+
+    /* ---------- ZELLE INFO ---------- */
+    .zelle-section {
+      max-width: 700px; margin: 30px auto; padding: 0 20px;
+    }
+    .zelle-card {
+      background: #fff; border-radius: 12px; padding: 28px 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08); text-align: center;
+    }
+    .zelle-card h2 { font-size: 1.3rem; margin-bottom: 6px; color: #0f3460; }
+    .zelle-card p.subtext { font-size: 0.9rem; color: #888; margin-bottom: 18px; }
+    .zelle-details {
+      display: inline-flex; flex-direction: column; gap: 8px;
+      background: #f0f4ff; padding: 16px 28px; border-radius: 8px;
+      font-size: 1rem;
+    }
+    .zelle-details span { display: flex; align-items: center; gap: 8px; }
+    .zelle-details .label { font-weight: 600; color: #0f3460; min-width: 60px; text-align: right; }
+    .zelle-note {
+      margin-top: 14px; font-size: 0.85rem; color: #999;
+    }
+
+    /* ---------- FORM ---------- */
+    .form-section {
+      max-width: 700px; margin: 30px auto; padding: 0 20px;
+    }
+    .form-card {
+      background: #fff; border-radius: 12px; padding: 28px 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .form-card h2 { font-size: 1.3rem; margin-bottom: 18px; color: #0f3460; }
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #555; }
+    .form-row input, .form-row textarea {
+      width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px;
+      font-size: 0.95rem; font-family: inherit; transition: border 0.2s;
+    }
+    .form-row input:focus, .form-row textarea:focus { outline: none; border-color: #3a86ff; }
+    .form-row textarea { resize: vertical; min-height: 80px; }
+    .form-row-inline { display: flex; gap: 14px; }
+    .form-row-inline .form-row { flex: 1; }
+    .btn-submit {
+      display: inline-block; padding: 12px 32px;
+      background: linear-gradient(135deg, #0f3460, #3a86ff); color: #fff;
+      border: none; border-radius: 8px; font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-submit:hover { opacity: 0.9; }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ---------- MESSAGES WALL ---------- */
+    .wall-section {
+      max-width: 700px; margin: 30px auto 60px; padding: 0 20px;
+    }
+    .wall-section h2 { font-size: 1.3rem; margin-bottom: 18px; color: #0f3460; }
+    .wall-list { display: flex; flex-direction: column; gap: 16px; }
+    .wall-card {
+      background: #fff; border-radius: 12px; padding: 22px 26px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .wall-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .wall-card-name { font-weight: 700; color: #0f3460; }
+    .wall-card-amount { font-weight: 700; color: #27ae60; font-size: 0.95rem; }
+    .wall-card-message { font-size: 0.95rem; color: #444; }
+    .wall-card-date { font-size: 0.78rem; color: #aaa; margin-top: 8px; }
+
+    .empty-wall { text-align: center; color: #aaa; padding: 40px 0; font-size: 0.95rem; }
+
+    /* ---------- FOOTER ---------- */
+    footer {
+      text-align: center; padding: 30px 20px; font-size: 0.82rem; color: #aaa;
+      border-top: 1px solid #e8e8e8;
+    }
+
+    /* ---------- TOAST ---------- */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: #27ae60; color: #fff; padding: 12px 28px; border-radius: 8px;
+      font-size: 0.95rem; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100;
+    }
+    .toast.show { opacity: 1; }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.6rem; }
+      .progress-raised { font-size: 1.4rem; }
+      .form-row-inline { flex-direction: column; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="photo-placeholder">
+      <!-- Replace the text below with: <img src="photo.jpg" alt="Photo"> -->
+      Photo
+    </div>
+    <h1 id="heroName">In Loving Memory of Larry Robinson</h1>
+    <div class="dates">&dagger; 2026</div>
+    <p class="memorial-message">
+      <!-- REPLACE THIS PLACEHOLDER TEXT WITH YOUR MEMORIAL MESSAGE -->
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
+      ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+      ullamco laboris nisi ut aliquip ex ea commodo consequat. [PLACEHOLDER: Replace this with
+      a personal message about Larry and the purpose of this fund.]
+    </p>
+  </section>
+
+  <!-- ============ PROGRESS ============ -->
+  <section class="progress-section">
+    <div class="progress-card">
+      <div class="progress-amounts">
+        <span class="progress-raised">$<span id="totalRaised">0</span></span>
+        <span class="progress-goal">raised of $<span id="goalAmount">5,000</span> goal</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+      </div>
+      <div class="progress-donors"><span id="donorCount">0</span> donations</div>
+    </div>
+  </section>
+
+  <!-- ============ ZELLE ============ -->
+  <section class="zelle-section">
+    <div class="zelle-card">
+      <h2>How to Donate</h2>
+      <p class="subtext">Send via Zelle, then post a message below so we can track progress.</p>
+      <div class="zelle-details">
+        <span><span class="label">Phone:</span> <span id="zellePhone">(678) 823-3999</span></span>
+      </div>
+      <p class="zelle-note">Please include your name in the Zelle memo so we can match your donation.</p>
+    </div>
+  </section>
+
+  <!-- ============ POST FORM ============ -->
+  <section class="form-section">
+    <div class="form-card">
+      <h2>Leave a Message &amp; Log Your Donation</h2>
+      <form id="postForm">
+        <div class="form-row-inline">
+          <div class="form-row">
+            <label for="fname">Your Name</label>
+            <input type="text" id="fname" required placeholder="Jane Doe">
+          </div>
+          <div class="form-row">
+            <label for="famount">Amount Donated ($)</label>
+            <input type="number" id="famount" min="0" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="fmessage">Message (optional)</label>
+          <textarea id="fmessage" placeholder="Share a memory or a kind word..."></textarea>
+        </div>
+        <button type="submit" class="btn-submit" id="btnSubmit">Post</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ WALL ============ -->
+  <section class="wall-section">
+    <h2>Messages &amp; Donations</h2>
+    <div class="wall-list" id="wallList">
+      <div class="empty-wall" id="emptyWall">No messages yet. Be the first!</div>
+    </div>
+  </section>
+
+  <footer>Made with love by friends &amp; family.</footer>
+
+  <div class="toast" id="toast">Thank you for your support!</div>
+
+  <!-- ============ FIREBASE ============ -->
+  <script type="module">
+    // -----------------------------------------------------------------
+    //  FIREBASE SETUP  --  Follow the instructions in README to get
+    //  your config values and paste them here.
+    // -----------------------------------------------------------------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, query, orderBy, onSnapshot, Timestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBWOWaxT0LRRGg2MpG5_53KwJnfLKmCL3I",
+      authDomain:        "alina-basiuk-community-fund.firebaseapp.com",
+      projectId:         "alina-basiuk-community-fund",
+      storageBucket:     "alina-basiuk-community-fund.firebasestorage.app",
+      messagingSenderId: "662573447055",
+      appId:             "1:662573447055:web:07d995b76c0c30c64e3dfa"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    // -----------------------------------------------------------------
+    //  CONFIG  --  Edit these values
+    // -----------------------------------------------------------------
+    const GOAL = 5000;   // fundraising goal in dollars
+
+    // -----------------------------------------------------------------
+    //  RENDER WALL  (real-time listener)
+    // -----------------------------------------------------------------
+    const wallList  = document.getElementById("wallList");
+    const emptyWall = document.getElementById("emptyWall");
+
+    const q = query(collection(db, "donations"), orderBy("createdAt", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+      let totalRaised = 0;
+      let donorCount  = 0;
+      const fragments = [];
+
+      snapshot.forEach((doc) => {
+        const d = doc.data();
+        const amount = parseFloat(d.amount) || 0;
+        totalRaised += amount;
+        donorCount++;
+
+        const date = d.createdAt
+          ? new Date(d.createdAt.seconds * 1000).toLocaleDateString("en-US", {
+              month: "short", day: "numeric", year: "numeric"
+            })
+          : "";
+
+        fragments.push(`
+          <div class="wall-card">
+            <div class="wall-card-header">
+              <span class="wall-card-name">${escapeHtml(d.name)}</span>
+              ${amount > 0 ? `<span class="wall-card-amount">$${amount.toFixed(2)}</span>` : ""}
+            </div>
+            ${d.message ? `<div class="wall-card-message">${escapeHtml(d.message)}</div>` : ""}
+            <div class="wall-card-date">${date}</div>
+          </div>
+        `);
+      });
+
+      // Update wall
+      if (fragments.length === 0) {
+        emptyWall.style.display = "block";
+      } else {
+        emptyWall.style.display = "none";
+        wallList.innerHTML = fragments.join("");
+      }
+
+      // Update progress
+      document.getElementById("totalRaised").textContent = totalRaised.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      document.getElementById("donorCount").textContent  = donorCount;
+      const pct = Math.min((totalRaised / GOAL) * 100, 100);
+      document.getElementById("progressBar").style.width = pct + "%";
+    });
+
+    // -----------------------------------------------------------------
+    //  FORM SUBMIT
+    // -----------------------------------------------------------------
+    const form = document.getElementById("postForm");
+    const btn  = document.getElementById("btnSubmit");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = "Posting...";
+
+      const name    = document.getElementById("fname").value.trim();
+      const amount  = document.getElementById("famount").value;
+      const message = document.getElementById("fmessage").value.trim();
+
+      try {
+        await addDoc(collection(db, "donations"), {
+          name,
+          amount:    amount ? parseFloat(amount) : 0,
+          message,
+          createdAt: Timestamp.now()
+        });
+        form.reset();
+        showToast("Thank you for your support!");
+      } catch (err) {
+        console.error(err);
+        showToast("Something went wrong. Please try again.");
+      }
+
+      btn.disabled = false;
+      btn.textContent = "Post";
+    });
+
+    // -----------------------------------------------------------------
+    //  HELPERS
+    // -----------------------------------------------------------------
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.appendChild(document.createTextNode(text));
+      return div.innerHTML;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 3000);
+    }
+  </script>
+</body>
+</html>
