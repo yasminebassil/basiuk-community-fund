@@ -331,7 +331,7 @@
           <div class="wall-card">
             <div class="wall-card-header">
               <span class="wall-card-name">${escapeHtml(d.name)}</span>
-              ${amount > 0 && !d.hideAmount ? `<span class="wall-card-amount">$${amount.toFixed(2)}</span>` : ""}
+              ${amount > 0 ? `<span class="wall-card-amount">${d.hideAmount ? "Donated" : "$" + amount.toFixed(2)}</span>` : ""}
             </div>
             ${d.message ? `<div class="wall-card-message">${escapeHtml(d.message)}</div>` : ""}
             <div class="wall-card-date">${date}</div>
