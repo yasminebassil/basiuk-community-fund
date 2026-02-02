@@ -254,6 +254,14 @@
           </div>
         </div>
         <div class="form-row">
+          <label for="fpaymethod">Payment Method</label>
+          <select id="fpaymethod" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; font-family: inherit; transition: border 0.2s; background: #fff;">
+            <option value="">N/A (message only)</option>
+            <option value="zelle">Zelle</option>
+            <option value="venmo">Venmo</option>
+          </select>
+        </div>
+        <div class="form-row">
           <label for="fmessage">Message (optional)</label>
           <textarea id="fmessage" placeholder="Share a memory or a kind word..."></textarea>
         </div>
@@ -391,12 +399,14 @@
       }
 
       const hideAmount = document.getElementById("fhideamount").checked;
+      const payMethod  = document.getElementById("fpaymethod").value;
 
       try {
         await addDoc(collection(db, "donations"), {
           name,
           amount:    amount ? parseFloat(amount) : 0,
           hideAmount,
+          payMethod,
           message,
           createdAt: Timestamp.now()
         });

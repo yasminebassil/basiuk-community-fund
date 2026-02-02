@@ -206,6 +206,7 @@
             <tr>
               <th>Name</th>
               <th>Amount</th>
+              <th>Method</th>
               <th>Message</th>
               <th>Date</th>
               <th>Received</th>
@@ -213,7 +214,7 @@
             </tr>
           </thead>
           <tbody id="tableBody">
-            <tr><td colspan="6" class="empty-table">Loading donations...</td></tr>
+            <tr><td colspan="7" class="empty-table">Loading donations...</td></tr>
           </tbody>
         </table>
       </div>
@@ -319,9 +320,13 @@
             })
           : "";
 
+        const payMethod = d.payMethod || "";
+        const methodLabel = payMethod === "zelle" ? "Zelle" : payMethod === "venmo" ? "Venmo" : "&mdash;";
+
         allDonations.push({
           name: d.name || "",
           amount,
+          payMethod,
           message: d.message || "",
           date,
           verified,
@@ -332,6 +337,7 @@
           <tr>
             <td class="td-name">${escapeHtml(d.name || "")}</td>
             <td class="td-amount">${amount > 0 ? "$" + amount.toFixed(2) : "&mdash;"}</td>
+            <td>${methodLabel}</td>
             <td class="td-message" title="${escapeAttr(d.message || "")}">${escapeHtml(d.message || "")}</td>
             <td class="td-date">${date}</td>
             <td><input type="checkbox" class="cb-received" data-id="${id}" ${verified ? "checked" : ""}></td>
@@ -341,7 +347,7 @@
       });
 
       if (rows.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6" class="empty-table">No donations yet.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="7" class="empty-table">No donations yet.</td></tr>';
       } else {
         tableBody.innerHTML = rows.join("");
       }
@@ -391,13 +397,14 @@
         return;
       }
 
-      const header = ["Name", "Amount", "Message", "Date", "Received on Zelle"];
+      const header = ["Name", "Amount", "Method", "Message", "Date", "Received"];
       const csvRows = [header.join(",")];
 
       allDonations.forEach((d) => {
         csvRows.push([
           csvEscape(d.name),
           d.amount.toFixed(2),
+          csvEscape(d.payMethod === "zelle" ? "Zelle" : d.payMethod === "venmo" ? "Venmo" : ""),
           csvEscape(d.message),
           csvEscape(d.date),
           d.verified ? "Yes" : "No"
