@@ -157,14 +157,14 @@
     <div class="photo-placeholder">
       <img src="photo.png" alt="Larry Robinson">
     </div>
-    <h1 id="heroName">In Loving Memory of Larry Robinson</h1>
-    <div class="dates">&dagger; 2026</div>
+    <h1 id="heroName">Robinson-Basiuk Community Fund</h1>
+    <div class="dates">Dedicated to Larry Robinson</div>
     <p class="memorial-message">
-      <!-- REPLACE THIS PLACEHOLDER TEXT WITH YOUR MEMORIAL MESSAGE -->
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
-      ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-      ullamco laboris nisi ut aliquip ex ea commodo consequat. [PLACEHOLDER: Replace this with
-      a personal message about Larry and the purpose of this fund.]
+      This page is dedicated to Larry Robinson, a wonderful person who has touched so many lives.
+      We are coming together as friends and family to support his loved ones during this difficult time.
+      This fund will help cover all costs associated with his passing.
+      <br><br>
+      Any contribution, no matter how small, means the world. Thank you for your generosity and love.
     </p>
   </section>
 
@@ -225,12 +225,17 @@
         <div class="form-row-inline">
           <div class="form-row">
             <label for="fname">Your Name</label>
-            <input type="text" id="fname" required placeholder="Jane Doe">
+            <input type="text" id="fname" placeholder="Jane Doe">
           </div>
           <div class="form-row">
             <label for="famount">Amount Donated ($)</label>
             <input type="number" id="famount" min="0" step="0.01" placeholder="0.00">
           </div>
+        </div>
+        <div class="form-row">
+          <label style="font-size: 0.85rem; font-weight: 400; color: #888; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="fanon"> Post as Anonymous
+          </label>
         </div>
         <div class="form-row">
           <label for="fmessage">Message (optional)</label>
@@ -344,9 +349,17 @@
       btn.disabled = true;
       btn.textContent = "Posting...";
 
-      const name    = document.getElementById("fname").value.trim();
+      const isAnon  = document.getElementById("fanon").checked;
+      const name    = isAnon ? "Anonymous" : document.getElementById("fname").value.trim();
       const amount  = document.getElementById("famount").value;
       const message = document.getElementById("fmessage").value.trim();
+
+      if (!isAnon && !name) {
+        document.getElementById("fname").focus();
+        btn.disabled = false;
+        btn.textContent = "Post";
+        return;
+      }
 
       try {
         await addDoc(collection(db, "donations"), {
