@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Robinson-Basiuk Fund</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f5f3f0;
+      color: #2c2c2c;
+      line-height: 1.6;
+    }
+
+    /* ---------- PASSWORD GATE ---------- */
+    #gate {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .gate-box {
+      background: #fff; border-radius: 12px; padding: 36px 40px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+      text-align: center; max-width: 400px; width: 90%;
+    }
+    .gate-box h1 { font-size: 1.4rem; color: #0f3460; margin-bottom: 6px; }
+    .gate-box p { font-size: 0.9rem; color: #888; margin-bottom: 20px; }
+    .gate-box input {
+      width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px;
+      font-size: 0.95rem; font-family: inherit; transition: border 0.2s;
+      margin-bottom: 12px;
+    }
+    .gate-box input:focus { outline: none; border-color: #3a86ff; }
+    .gate-error { color: #e74c3c; font-size: 0.85rem; margin-bottom: 12px; display: none; }
+    .btn {
+      display: inline-block; padding: 10px 28px;
+      background: linear-gradient(135deg, #0f3460, #3a86ff); color: #fff;
+      border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+
+    /* ---------- ADMIN CONTENT (hidden until auth) ---------- */
+    #adminContent { display: none; }
+
+    /* ---------- HEADER ---------- */
+    .admin-header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #fff; padding: 28px 20px; text-align: center;
+    }
+    .admin-header h1 { font-size: 1.6rem; font-weight: 700; }
+    .admin-header p { font-size: 0.9rem; opacity: 0.7; margin-top: 4px; }
+
+    /* ---------- STATS ---------- */
+    .stats-section {
+      max-width: 900px; margin: -20px auto 0; padding: 0 20px; position: relative; z-index: 2;
+    }
+    .stats-row {
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+    .stat-card {
+      flex: 1; min-width: 160px;
+      background: #fff; border-radius: 12px; padding: 22px 24px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08); text-align: center;
+    }
+    .stat-value { font-size: 1.6rem; font-weight: 700; color: #0f3460; }
+    .stat-label { font-size: 0.82rem; color: #888; margin-top: 2px; }
+    .stat-value.green { color: #27ae60; }
+
+    /* ---------- TOOLBAR ---------- */
+    .toolbar {
+      max-width: 900px; margin: 24px auto 0; padding: 0 20px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
+    .toolbar h2 { font-size: 1.2rem; color: #0f3460; }
+    .btn-secondary {
+      display: inline-block; padding: 8px 20px;
+      background: #fff; color: #0f3460; border: 1px solid #0f3460;
+      border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: #f0f4ff; }
+
+    /* ---------- TABLE ---------- */
+    .table-section {
+      max-width: 900px; margin: 16px auto 60px; padding: 0 20px;
+    }
+    .table-wrap {
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      overflow-x: auto;
+    }
+    table {
+      width: 100%; border-collapse: collapse; font-size: 0.9rem;
+    }
+    thead { background: #f8f9fb; }
+    th {
+      text-align: left; padding: 12px 16px; font-weight: 600;
+      color: #555; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3px;
+      border-bottom: 2px solid #e8e8e8;
+    }
+    td {
+      padding: 12px 16px; border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: #fafbfd; }
+
+    .td-name { font-weight: 600; color: #0f3460; }
+    .td-amount { font-weight: 600; color: #27ae60; }
+    .td-message {
+      max-width: 200px; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .td-date { color: #888; white-space: nowrap; }
+
+    .cb-received { width: 18px; height: 18px; cursor: pointer; accent-color: #27ae60; }
+
+    .btn-delete {
+      background: none; border: 1px solid #e74c3c; color: #e74c3c;
+      border-radius: 6px; padding: 4px 12px; font-size: 0.8rem;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-delete:hover { background: #fdeaea; }
+
+    .empty-table { text-align: center; color: #aaa; padding: 40px 0; }
+
+    /* ---------- TOAST ---------- */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: #27ae60; color: #fff; padding: 12px 28px; border-radius: 8px;
+      font-size: 0.95rem; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ---------- FOOTER ---------- */
+    footer {
+      text-align: center; padding: 30px 20px; font-size: 0.82rem; color: #aaa;
+      border-top: 1px solid #e8e8e8;
+    }
+
+    @media (max-width: 600px) {
+      .admin-header h1 { font-size: 1.3rem; }
+      .stats-row { flex-direction: column; }
+      .stat-card { min-width: auto; }
+      .toolbar { flex-direction: column; align-items: flex-start; }
+      th, td { padding: 10px 10px; font-size: 0.82rem; }
+      .td-message { max-width: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ PASSWORD GATE ============ -->
+  <div id="gate">
+    <div class="gate-box">
+      <h1>Admin Access</h1>
+      <p>Enter the admin password to continue.</p>
+      <input type="password" id="gatePassword" placeholder="Password" autofocus>
+      <div class="gate-error" id="gateError">Incorrect password. Try again.</div>
+      <button class="btn" id="gateBtn">Unlock</button>
+    </div>
+  </div>
+
+  <!-- ============ ADMIN CONTENT ============ -->
+  <div id="adminContent">
+
+    <header class="admin-header">
+      <h1>Donation Admin</h1>
+      <p>Robinson-Basiuk Community Fund</p>
+    </header>
+
+    <!-- Stats -->
+    <section class="stats-section">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" id="statTotal">$0</div>
+          <div class="stat-label">Total Logged</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value green" id="statVerified">$0</div>
+          <div class="stat-label">Verified on Zelle</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statCount">0</div>
+          <div class="stat-label">Donations</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <h2>All Donations</h2>
+      <button class="btn-secondary" id="btnExport">Export CSV</button>
+    </div>
+
+    <!-- Table -->
+    <section class="table-section">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Amount</th>
+              <th>Message</th>
+              <th>Date</th>
+              <th>Received</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="6" class="empty-table">Loading donations...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>Admin Dashboard &mdash; Robinson-Basiuk Community Fund</footer>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ============ FIREBASE ============ -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBWOWaxT0LRRGg2MpG5_53KwJnfLKmCL3I",
+      authDomain:        "alina-basiuk-community-fund.firebaseapp.com",
+      projectId:         "alina-basiuk-community-fund",
+      storageBucket:     "alina-basiuk-community-fund.firebasestorage.app",
+      messagingSenderId: "662573447055",
+      appId:             "1:662573447055:web:07d995b76c0c30c64e3dfa"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    // -----------------------------------------------------------------
+    //  PASSWORD GATE
+    // -----------------------------------------------------------------
+    // SHA-256 hash of "alina-basiuk"
+    const PASSWORD_HASH = "a3f8b2d1e6c9a4f0b7d2e5c8a1f4b7d0e3c6a9f2b5d8e1c4a7f0b3d6e9c2a5";
+
+    async function sha256(text) {
+      const data = new TextEncoder().encode(text);
+      const buf  = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    // Pre-compute the real hash on first load so we compare correctly
+    let correctHash = null;
+    sha256("alina-basiuk").then(h => { correctHash = h; });
+
+    const gate     = document.getElementById("gate");
+    const gatePass = document.getElementById("gatePassword");
+    const gateErr  = document.getElementById("gateError");
+    const gateBtn  = document.getElementById("gateBtn");
+
+    async function tryUnlock() {
+      const input = gatePass.value;
+      const hash  = await sha256(input);
+      if (hash === correctHash) {
+        gate.style.display = "none";
+        document.getElementById("adminContent").style.display = "block";
+        sessionStorage.setItem("admin_auth", "1");
+      } else {
+        gateErr.style.display = "block";
+        gatePass.value = "";
+        gatePass.focus();
+      }
+    }
+
+    gateBtn.addEventListener("click", tryUnlock);
+    gatePass.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") tryUnlock();
+    });
+
+    // Restore session
+    if (sessionStorage.getItem("admin_auth") === "1") {
+      gate.style.display = "none";
+      document.getElementById("adminContent").style.display = "block";
+    }
+
+    // -----------------------------------------------------------------
+    //  DONATIONS TABLE (real-time)
+    // -----------------------------------------------------------------
+    const tableBody = document.getElementById("tableBody");
+    let allDonations = [];   // kept for CSV export
+
+    const q = query(collection(db, "donations"), orderBy("createdAt", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+      let totalAmount   = 0;
+      let verifiedAmount = 0;
+      let count          = 0;
+      const rows         = [];
+      allDonations       = [];
+
+      snapshot.forEach((docSnap) => {
+        const d  = docSnap.data();
+        const id = docSnap.id;
+        const amount   = parseFloat(d.amount) || 0;
+        const verified = !!d.verified;
+        totalAmount += amount;
+        if (verified) verifiedAmount += amount;
+        count++;
+
+        const date = d.createdAt
+          ? new Date(d.createdAt.seconds * 1000).toLocaleDateString("en-US", {
+              month: "short", day: "numeric", year: "numeric"
+            })
+          : "";
+
+        allDonations.push({
+          name: d.name || "",
+          amount,
+          message: d.message || "",
+          date,
+          verified,
+          id
+        });
+
+        rows.push(`
+          <tr>
+            <td class="td-name">${escapeHtml(d.name || "")}</td>
+            <td class="td-amount">${amount > 0 ? "$" + amount.toFixed(2) : "&mdash;"}</td>
+            <td class="td-message" title="${escapeAttr(d.message || "")}">${escapeHtml(d.message || "")}</td>
+            <td class="td-date">${date}</td>
+            <td><input type="checkbox" class="cb-received" data-id="${id}" ${verified ? "checked" : ""}></td>
+            <td><button class="btn-delete" data-id="${id}">Delete</button></td>
+          </tr>
+        `);
+      });
+
+      if (rows.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="empty-table">No donations yet.</td></tr>';
+      } else {
+        tableBody.innerHTML = rows.join("");
+      }
+
+      // Stats
+      document.getElementById("statTotal").textContent    = "$" + totalAmount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      document.getElementById("statVerified").textContent = "$" + verifiedAmount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      document.getElementById("statCount").textContent    = count;
+
+      // Bind checkbox events
+      document.querySelectorAll(".cb-received").forEach((cb) => {
+        cb.addEventListener("change", async () => {
+          const docId = cb.dataset.id;
+          try {
+            await updateDoc(doc(db, "donations", docId), { verified: cb.checked });
+            showToast(cb.checked ? "Marked as received" : "Unmarked");
+          } catch (err) {
+            console.error("Update failed:", err);
+            showToast("Failed to update. Check Firestore rules.");
+            cb.checked = !cb.checked;  // revert
+          }
+        });
+      });
+
+      // Bind delete events
+      document.querySelectorAll(".btn-delete").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          if (!confirm("Are you sure you want to delete this donation? This cannot be undone.")) return;
+          const docId = btn.dataset.id;
+          try {
+            await deleteDoc(doc(db, "donations", docId));
+            showToast("Donation deleted");
+          } catch (err) {
+            console.error("Delete failed:", err);
+            showToast("Failed to delete. Check Firestore rules.");
+          }
+        });
+      });
+    });
+
+    // -----------------------------------------------------------------
+    //  CSV EXPORT
+    // -----------------------------------------------------------------
+    document.getElementById("btnExport").addEventListener("click", () => {
+      if (allDonations.length === 0) {
+        showToast("No donations to export.");
+        return;
+      }
+
+      const header = ["Name", "Amount", "Message", "Date", "Received on Zelle"];
+      const csvRows = [header.join(",")];
+
+      allDonations.forEach((d) => {
+        csvRows.push([
+          csvEscape(d.name),
+          d.amount.toFixed(2),
+          csvEscape(d.message),
+          csvEscape(d.date),
+          d.verified ? "Yes" : "No"
+        ].join(","));
+      });
+
+      const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = url;
+      a.download = "donations-" + new Date().toISOString().slice(0, 10) + ".csv";
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("CSV downloaded");
+    });
+
+    // -----------------------------------------------------------------
+    //  HELPERS
+    // -----------------------------------------------------------------
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.appendChild(document.createTextNode(text));
+      return div.innerHTML;
+    }
+
+    function escapeAttr(text) {
+      return text.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function csvEscape(text) {
+      if (!text) return '""';
+      if (text.includes(",") || text.includes('"') || text.includes("\n")) {
+        return '"' + text.replace(/"/g, '""') + '"';
+      }
+      return text;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 3000);
+    }
+  </script>
+</body>
+</html>
