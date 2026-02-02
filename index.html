@@ -244,6 +244,9 @@
           <div class="form-row">
             <label for="famount">Amount Donated ($)</label>
             <input type="number" id="famount" min="0" step="0.01" placeholder="0.00">
+            <label style="font-size: 0.82rem; font-weight: 400; color: #888; margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="checkbox" id="fhideamount" style="width: auto;"> Hide My Donation Amount
+            </label>
           </div>
         </div>
         <div class="form-row">
@@ -328,7 +331,7 @@
           <div class="wall-card">
             <div class="wall-card-header">
               <span class="wall-card-name">${escapeHtml(d.name)}</span>
-              ${amount > 0 ? `<span class="wall-card-amount">$${amount.toFixed(2)}</span>` : ""}
+              ${amount > 0 && !d.hideAmount ? `<span class="wall-card-amount">$${amount.toFixed(2)}</span>` : ""}
             </div>
             ${d.message ? `<div class="wall-card-message">${escapeHtml(d.message)}</div>` : ""}
             <div class="wall-card-date">${date}</div>
@@ -383,10 +386,13 @@
         return;
       }
 
+      const hideAmount = document.getElementById("fhideamount").checked;
+
       try {
         await addDoc(collection(db, "donations"), {
           name,
           amount:    amount ? parseFloat(amount) : 0,
+          hideAmount,
           message,
           createdAt: Timestamp.now()
         });
