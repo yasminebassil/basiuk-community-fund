@@ -46,25 +46,35 @@
       color: rgba(255,255,255,0.92);
     }
 
-    /* ---------- PROGRESS BAR ---------- */
+    /* ---------- FUNDRAISER TOTAL ---------- */
     .progress-section {
       max-width: 700px; margin: -30px auto 0; padding: 0 20px; position: relative; z-index: 2;
     }
     .progress-card {
-      background: #fff; border-radius: 12px; padding: 28px 32px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      background: linear-gradient(135deg, #fff 0%, #f8faff 100%);
+      border-radius: 16px; padding: 32px 36px;
+      box-shadow: 0 8px 32px rgba(15, 52, 96, 0.12);
+      text-align: center;
+      border: 1px solid rgba(58, 134, 255, 0.1);
     }
-    .progress-amounts { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
-    .progress-raised { font-size: 1.8rem; font-weight: 700; color: #0f3460; }
-    .progress-goal { font-size: 0.95rem; color: #888; }
-    .progress-bar-bg {
-      width: 100%; height: 10px; background: #e8e8e8; border-radius: 5px; overflow: hidden;
+    .fundraiser-label {
+      font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px;
+      color: #3a86ff; font-weight: 600; margin-bottom: 8px;
     }
-    .progress-bar-fill {
-      height: 100%; background: linear-gradient(90deg, #0f3460, #3a86ff); border-radius: 5px;
-      transition: width 0.6s ease;
+    .progress-raised {
+      font-size: 3rem; font-weight: 800; color: #0f3460;
+      background: linear-gradient(135deg, #0f3460, #3a86ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    .progress-donors { margin-top: 10px; font-size: 0.9rem; color: #888; }
+    .progress-thanks {
+      font-size: 1.1rem; color: #555; margin-top: 12px; line-height: 1.6;
+    }
+    .progress-donors {
+      display: inline-block; margin-top: 16px; padding: 8px 20px;
+      background: rgba(58, 134, 255, 0.1); border-radius: 20px;
+      font-size: 0.9rem; color: #3a86ff; font-weight: 600;
+    }
 
     /* ---------- ZELLE INFO ---------- */
     .zelle-section {
@@ -150,7 +160,8 @@
 
     @media (max-width: 600px) {
       .hero h1 { font-size: 1.6rem; }
-      .progress-raised { font-size: 1.4rem; }
+      .progress-raised { font-size: 2.2rem; }
+      .progress-thanks { font-size: 0.95rem; }
       .form-row-inline { flex-direction: column; gap: 0; }
     }
   </style>
@@ -177,17 +188,13 @@
     </p>
   </section>
 
-  <!-- ============ PROGRESS ============ -->
+  <!-- ============ FUNDRAISER TOTAL ============ -->
   <section class="progress-section">
     <div class="progress-card">
-      <div class="progress-amounts">
-        <span class="progress-raised">$<span id="totalRaised">0</span></span>
-        <span class="progress-goal">raised of $<span id="goalAmount">5,000</span> goal</span>
-      </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
-      </div>
-      <div class="progress-donors"><span id="donorCount">0</span> donations</div>
+      <div class="fundraiser-label">Together We Raised</div>
+      <div class="progress-raised">$<span id="totalRaised">0</span></div>
+      <p class="progress-thanks">Thank you to everyone who contributed to support the Robinson-Basiuk family during this difficult time.</p>
+      <div class="progress-donors"><span id="donorCount">0</span> generous donors</div>
     </div>
   </section>
 
@@ -309,10 +316,6 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // -----------------------------------------------------------------
-    //  CONFIG  --  Edit these values
-    // -----------------------------------------------------------------
-    const GOAL = 5000;   // fundraising goal in dollars
 
     // -----------------------------------------------------------------
     //  RENDER WALL  (real-time listener)
@@ -359,11 +362,9 @@
         wallList.innerHTML = fragments.join("");
       }
 
-      // Update progress
+      // Update totals
       document.getElementById("totalRaised").textContent = totalRaised.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
       document.getElementById("donorCount").textContent  = donorCount;
-      const pct = Math.min((totalRaised / GOAL) * 100, 100);
-      document.getElementById("progressBar").style.width = pct + "%";
     });
 
     // -----------------------------------------------------------------
